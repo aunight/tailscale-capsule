@@ -59,17 +59,12 @@ internal static class Native
             SetWindowPos(hwnd, 0, 0, 0, 0, 0, 0x0027); // FRAMECHANGED, no move/size/z-order
         }
         int dark = 1; DwmSetWindowAttribute(hwnd, 20, ref dark, 4);
-        // Own the rounded outline: this also clips the residual WinUI non-client
-        // stroke on systems where DWM's border-color suppression is ignored.
-        int round = 1; DwmSetWindowAttribute(hwnd, 33, ref round, 4);
-        int policy = 1; DwmSetWindowAttribute(hwnd, 2, ref policy, 4);
+        // Keep the native composition outline; a GDI region leaves opaque corner
+        // pixels around a WinUI system backdrop on some desktops.
+        SetWindowRgn(hwnd, 0, true);
+        int round = 2; DwmSetWindowAttribute(hwnd, 33, ref round, 4);
+        int policy = 0; DwmSetWindowAttribute(hwnd, 2, ref policy, 4);
         int none = unchecked((int)0xFFFFFFFE); int setResult = DwmSetWindowAttribute(hwnd, 34, ref none, 4);
-        if (GetWindowRect(hwnd, out var bounds))
-        {
-            int diameter = Math.Max(16, (int)(24 * GetDpiForWindow(hwnd) / 96.0));
-            nint region = CreateRoundRectRgn(1, 1, bounds.Right - bounds.Left - 1, bounds.Bottom - bounds.Top - 1, diameter, diameter);
-            if (region != 0 && SetWindowRgn(hwnd, region, true) == 0) DeleteObject(region);
-        }
         if (Environment.GetCommandLineArgs().Contains("--inspect"))
         {
             int hr = DwmGetWindowAttribute(hwnd, 34, out int actual, 4);

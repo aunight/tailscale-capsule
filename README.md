@@ -28,7 +28,7 @@
 ## 安裝
 
 1. 安裝並登入 [官方 Tailscale Windows 用戶端](https://tailscale.com/download/windows)。
-2. 到 [Releases](https://github.com/aunight/tailscale-capsule/releases/latest) 下載 `TailscaleCapsule-2.1.0-Setup-x64.exe`。
+2. 到 [Releases](https://github.com/aunight/tailscale-capsule/releases/latest) 下載 `TailscaleCapsule-2.1.1-Setup-x64.exe`。
 3. 安裝後從系統匣開啟 Capsule。也提供完整可攜式 ZIP，解壓後執行 `TailscaleCapsule.exe`。
 
 支援 Windows 11 x64。Release 已包含 .NET 與 Windows App SDK 執行階段，不需另外安裝 .NET。MiSans TC 使用系統已安裝字體，未安裝時會使用系統替代字體。

@@ -46,7 +46,7 @@ public sealed partial class MainWindow : Window
     readonly CancellationTokenSource lifetime = new();
     readonly Grid root = new(), header = new();
     readonly StackPanel body = new() { Spacing = 18 }, peers = new() { Spacing = 20 };
-    readonly StackPanel quickBody = new() { Spacing = 8, Margin = new(20, 0, 20, 8), Visibility = Visibility.Collapsed };
+    readonly StackPanel quickBody = new() { Spacing = 8, Margin = new(20, 0, 20, 20), Visibility = Visibility.Collapsed };
     readonly ScrollViewer quickScroll = new() { VerticalScrollBarVisibility = ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled, Visibility = Visibility.Collapsed };
     readonly TextBlock titleCaption = Text("Tailscale Capsule", 19, Ink, true);
     ToggleSwitch? quickConnect, glassToggle, startupToggle, updateToggle;

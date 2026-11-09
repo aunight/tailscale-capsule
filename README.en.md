@@ -28,7 +28,7 @@ All hostnames, addresses, and files shown in the screenshots are fictional examp
 ## Install
 
 1. Install and sign in to the [official Tailscale Windows client](https://tailscale.com/download/windows).
-2. Download `TailscaleCapsule-2.1.0-Setup-x64.exe` from [Releases](https://github.com/aunight/tailscale-capsule/releases/latest).
+2. Download `TailscaleCapsule-2.1.1-Setup-x64.exe` from [Releases](https://github.com/aunight/tailscale-capsule/releases/latest).
 3. Open Capsule from the notification area. A self-contained portable ZIP is also available; extract the full folder and run `TailscaleCapsule.exe`.
 
 Windows 11 x64 is supported. Release packages include the .NET and Windows App SDK runtimes. MiSans TC is used when installed, with a system font fallback otherwise.
