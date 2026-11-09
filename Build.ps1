@@ -1,4 +1,4 @@
-param([string]$Version='2.1.1',[string]$InnoCompiler='',[switch]$SkipInstaller)
+param([string]$Version='2.1.2',[string]$InnoCompiler='',[switch]$SkipInstaller)
 $ErrorActionPreference='Stop'
 Set-Location $PSScriptRoot
 $publish=Join-Path $PSScriptRoot 'artifacts\publish'

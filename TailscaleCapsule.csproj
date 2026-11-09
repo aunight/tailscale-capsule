@@ -15,7 +15,7 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
-    <Version>2.1.1</Version>
+    <Version>2.1.2</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="tests\**\*.cs" />

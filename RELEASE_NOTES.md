@@ -1,15 +1,15 @@
-2.1.1 — 視窗外觀修正 / Window appearance fixes
+2.1.2 — 動畫與切換修正 / Animation and navigation fixes
 
 繁體中文
 
-- 改用 Windows 原生圓角，移除手動裁切造成的黑色角落與多餘框線。
-- 調整快速設定底部留白。
-- 繁體中文／英文介面、中英文介紹、Taildrop 紀錄與更新通知皆保留。
+- 開啟動畫縮短至 120ms，關閉動畫縮短至 90ms。
+- 設定與裝置頁改用 160ms 輕滑入和淡入動畫。
+- 修正切換設定時內容卡在透明狀態的問題。
+- 移除重複的 Windows 系統過場。
 
 English
 
-- Use native Windows corners instead of a clipped window region that could leave opaque corner pixels.
-- Balance the bottom spacing in quick settings.
-- Includes English and Traditional Chinese interfaces, bilingual documentation, Taildrop history, and update notifications.
-
-Validation: Windows build, resource checks, and automated service/history/update/localization checks. Cross-device file transfers have not been verified end to end.
+- Faster opening (120ms) and closing (90ms).
+- A 160ms slide and fade when switching between device and settings pages.
+- Fix content remaining transparent after navigating to settings.
+- Avoid overlapping Windows transition animations.

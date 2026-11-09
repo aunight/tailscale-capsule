@@ -51,6 +51,8 @@ internal static class Native
     [StructLayout(LayoutKind.Sequential)] public struct Rect { public int Left, Top, Right, Bottom; }
     public static void RemoveFrame(nint hwnd)
     {
+        // Use Capsule's short fade without a second DWM transition.
+        int disableTransitions = 1; DwmSetWindowAttribute(hwnd, 3, ref disableTransitions, 4);
         const long frameStyles = 0x00C00000L | 0x00040000L | 0x00080000L | 0x00030000L;
         long style = GetWindowLongPtr(hwnd, -16).ToInt64();
         if ((style & frameStyles) != 0)

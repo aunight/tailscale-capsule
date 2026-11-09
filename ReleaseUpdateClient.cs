@@ -9,7 +9,7 @@ namespace TailscaleCapsule;
 public record ReleaseUpdate(string Version, string Page, string Notes, string AssetName, string Download, string Digest);
 public static class ReleaseUpdateClient
 {
-    public const string CurrentVersion = "2.1.1";
+    public const string CurrentVersion = "2.1.2";
     public const string Repository = "aunight/tailscale-capsule";
     const string Prefix = "https://github.com/" + Repository + "/releases/";
     public static bool IsNewer(string candidate, string current) => Version.TryParse(candidate.TrimStart('v','V'), out var a) && Version.TryParse(current.TrimStart('v','V'), out var b) && a > b;

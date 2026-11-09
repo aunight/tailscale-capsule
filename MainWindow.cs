@@ -65,6 +65,8 @@ public sealed partial class MainWindow : Window
     readonly DispatcherTimer copyToastTimer = new() { Interval = TimeSpan.FromSeconds(2) };
     int visibilityRevision;
     Storyboard? surfaceAnimation;
+    Storyboard? pageAnimation;
+    bool switchingPanel;
     readonly CompositeTransform surfaceTransform = new();
     readonly TextBlock connectionIcon = Icon("\uf3ed", 22, Muted);
     readonly DispatcherTimer timer, toastTimer;
@@ -198,7 +200,7 @@ public sealed partial class MainWindow : Window
         AppWindow.Changed += (_, args) => { if (args.DidPositionChange) { preferences.X = AppWindow.Position.X; preferences.Y = AppWindow.Position.Y; preferences.Save(); } };
         AppWindow.Closing += (_, args) => { if (!exiting) { args.Cancel = true; HidePanel(); } };
         tray = new TrayIcon(hwnd, ShowPanel, TogglePanel, ShowQuickPanel, !DemoMode);
-        Activated += (_, args) => { if (args.WindowActivationState == WindowActivationState.Deactivated && !pickingFiles && !Environment.GetCommandLineArgs().Contains("--inspect")) HidePanel(); };
+        Activated += (_, args) => { if (args.WindowActivationState == WindowActivationState.Deactivated && !switchingPanel && !pickingFiles && !Environment.GetCommandLineArgs().Contains("--inspect")) HidePanel(); };
         timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
         timer.Tick += async (_, _) => { await RefreshAsync(); if (!DemoMode && preferences.UpdateNotifications && DateTimeOffset.UtcNow - lastUpdateCheck > TimeSpan.FromHours(6)) await CheckUpdatesAsync(false); };
         toastTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(4) };
@@ -580,50 +582,72 @@ public sealed partial class MainWindow : Window
     async Task SwitchPanelAsync(bool quick, bool history = false)
     {
         if (exiting) return;
-        int revision = ++visibilityRevision;
+        ++visibilityRevision;
         bool switching = AppWindow.IsVisible && (quickMode != quick || historyMode != history);
-        if (switching && new Windows.UI.ViewManagement.UISettings().AnimationsEnabled)
+        switchingPanel = true;
+        try
         {
-            AnimateSurface(0, .995f, 100); await Task.Delay(105);
-            if (revision != visibilityRevision || exiting) return;
+            // Resize an opaque surface. Fading the entire window to zero before
+            // resizing can leave WinUI's backdrop visible without its content.
+            surfaceAnimation?.Stop(); surfaceAnimation = null; root.Opacity = 1;
+            pageAnimation?.Stop(); pageAnimation = null;
+            quickMode = quick; historyMode = history; SyncQuickPanel(); if (history) RenderHistory();
+            ResizePanel(); PositionFlyout(); root.UpdateLayout(); OpenAnimated(!switching);
+            if (switching && new Windows.UI.ViewManagement.UISettings().AnimationsEnabled)
+            {
+                FrameworkElement panel = history ? historyBody : quick ? quickBody : body;
+                panel.Opacity = 1;
+                var fade = new DoubleAnimation { From=.8,To=1,Duration=new(TimeSpan.FromMilliseconds(140)),FillBehavior=FillBehavior.Stop };
+                Storyboard.SetTarget(fade,panel);Storyboard.SetTargetProperty(fade,"Opacity");
+                var offset=new TranslateTransform();panel.RenderTransform=offset;
+                var slide=new DoubleAnimation { From=10,To=0,Duration=new(TimeSpan.FromMilliseconds(160)),FillBehavior=FillBehavior.Stop,EnableDependentAnimation=true,
+                    EasingFunction=new CubicEase{EasingMode=EasingMode.EaseOut} };
+                Storyboard.SetTarget(slide,offset);Storyboard.SetTargetProperty(slide,"Y");
+                pageAnimation = new Storyboard();pageAnimation.Children.Add(fade);pageAnimation.Children.Add(slide);pageAnimation.Begin();
+            }
         }
-        quickMode = quick; historyMode = history; SyncQuickPanel(); if (history) RenderHistory(); ResizePanel(); PositionFlyout(); OpenAnimated();
+        finally { switchingPanel = false; }
         DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
         { if (quick) quickBody.Children.OfType<Button>().FirstOrDefault()?.Focus(FocusState.Programmatic); else connect.Focus(FocusState.Programmatic); });
         await RefreshAsync();
     }
-    void OpenAnimated()
+    void OpenAnimated(bool animate = true)
     {
         visibilityRevision++;
         bool wasHidden = !AppWindow.IsVisible;
         if (wasHidden) { surfaceAnimation?.Stop(); root.Opacity = 0; surfaceTransform.ScaleX = surfaceTransform.ScaleY = 1; }
         AppWindow.Show(); Activate(); Native.SetForegroundWindow(hwnd);
         Native.RemoveFrame(hwnd);
-        if (root.IsLoaded) AnimateSurface(1, 1, 240);
-        else DispatcherQueue.TryEnqueue(() => AnimateSurface(1, 1, 240));
+        if (!animate) { surfaceAnimation?.Stop();surfaceAnimation=null;root.Opacity=1;return; }
+        if (root.IsLoaded) AnimateSurface(1, 1, 120);
+        else DispatcherQueue.TryEnqueue(() => AnimateSurface(1, 1, 120));
     }
     async void HidePanel()
     {
-        if (exiting || !AppWindow.IsVisible) return;
+        if (exiting || switchingPanel || !AppWindow.IsVisible) return;
         int revision = ++visibilityRevision;
         bool animate = new Windows.UI.ViewManagement.UISettings().AnimationsEnabled;
-        if (animate) { AnimateSurface(0, .99f, 160); await Task.Delay(165); }
-        if (revision == visibilityRevision && !exiting) AppWindow.Hide();
+        if (animate) { AnimateSurface(0, .99f, 90); await Task.Delay(95); }
+        if (revision == visibilityRevision && !exiting)
+        {
+            AppWindow.Hide();surfaceAnimation?.Stop();surfaceAnimation=null;root.Opacity=1;
+        }
     }
     void AnimateSurface(float opacity, float scale, int ms)
     {
         double currentOpacity = root.Opacity, currentScale = 1;
-        surfaceAnimation?.Stop(); root.Opacity = currentOpacity; surfaceTransform.ScaleX = surfaceTransform.ScaleY = currentScale;
+        surfaceAnimation?.Stop(); root.Opacity = opacity; surfaceTransform.ScaleX = surfaceTransform.ScaleY = currentScale;
         if (!new Windows.UI.ViewManagement.UISettings().AnimationsEnabled) { root.Opacity = opacity; surfaceTransform.ScaleX = surfaceTransform.ScaleY = scale; return; }
         surfaceTransform.CenterX = root.ActualWidth; surfaceTransform.CenterY = root.ActualHeight;
         var storyboard = new Storyboard();
         void Add(DependencyObject target, string property, double from, double to)
         {
-            var animation = new DoubleAnimation { From = from, To = to, Duration = new(TimeSpan.FromMilliseconds(ms)), EnableDependentAnimation = true,
+            var animation = new DoubleAnimation { From = from, To = to, Duration = new(TimeSpan.FromMilliseconds(ms)), EnableDependentAnimation = true, FillBehavior=FillBehavior.Stop,
                 EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } };
             Storyboard.SetTarget(animation, target); Storyboard.SetTargetProperty(animation, property); storyboard.Children.Add(animation);
         }
         Add(root, "Opacity", currentOpacity, opacity);
+        storyboard.Completed += (_,_) => { if(ReferenceEquals(surfaceAnimation,storyboard)){root.Opacity=opacity;surfaceAnimation=null;} };
         surfaceAnimation = storyboard; storyboard.Begin();
     }
     void ShowCopyToast(string message)
