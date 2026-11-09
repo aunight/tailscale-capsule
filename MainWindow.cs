@@ -494,9 +494,13 @@ public sealed partial class MainWindow : Window
             try
             {
                 var content = new StackPanel { Spacing = 12 };
-                var description = Text("WinUI 3 · MiSans TC\nFont Awesome Free 6.7.2\n連線與 Taildrop 由官方 Tailscale 服務管理。", 14); description.TextWrapping = TextWrapping.Wrap; content.Children.Add(description);
-                content.Children.Add(new HyperlinkButton { Content = L("彩色裝置圖示：Icons8"), NavigateUri = new Uri("https://icons8.com/icons"), FontFamily = new("MiSans TC") });
-                var dialog = new ContentDialog { Title = "Tailscale Capsule " + ReleaseUpdateClient.CurrentVersion, Content = content, CloseButtonText = L("關閉"), XamlRoot = root.XamlRoot, RequestedTheme = ElementTheme.Dark }; await dialog.ShowAsync();
+                var version=Text("v"+ReleaseUpdateClient.CurrentVersion,12,Muted);version.Opacity=.65;content.Children.Add(version);
+                content.Children.Add(Text("WinUI 3 · MiSans TC",13,Muted));
+                content.Children.Add(Text("Font Awesome Free 6.7.2",13,Muted));
+                content.Children.Add(new HyperlinkButton { Content = L("彩色裝置圖示：Icons8"), NavigateUri = new Uri("https://icons8.com/icons"), FontSize=13,Padding=new(0),FontFamily = new("MiSans TC") });
+                content.Children.Add(new Border { Height=1,Background=Brush(0x18FFFFFF),Margin=new(0,4,0,4) });
+                content.Children.Add(Text("由 AuNight 製作",13,Ink));
+                var dialog = new ContentDialog { Title = "Tailscale Capsule", Content = content, CloseButtonText = L("關閉"), XamlRoot = root.XamlRoot, RequestedTheme = ElementTheme.Dark }; await dialog.ShowAsync();
             }
             finally { pickingFiles = false; }
         }));

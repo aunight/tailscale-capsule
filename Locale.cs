@@ -20,7 +20,7 @@ public static class Locale
         ["遠端桌面"]="Remote desktop",["這台電腦尚未安裝遠端桌面用戶端。"]="A remote desktop client is not installed on this PC.",["取得用戶端"]="Get a client",["無法開啟遠端桌面用戶端。"]="Couldn't open the remote desktop client.",
         ["查看更新"]="Update",["正在下載並驗證更新…"]="Downloading and verifying the update…",["更新未完成，請稍後再試。"]="Update didn't complete. Please try again later.",["檢查更新逾時，請稍後再試。"]="The update check timed out. Try again later.",["暫時無法檢查更新。"]="Couldn't check for updates right now.",
         ["無法讀取 Tailscale 狀態，請確認服務已啟動。"]="Couldn't read Tailscale status. Check that the service is running.",["Tailscale 回應逾時，請稍後重新整理。"]="Tailscale timed out. Please refresh again later.",["找不到 Tailscale，請先安裝官方 Tailscale 用戶端。"]="Tailscale was not found. Install the official Tailscale client first.",["操作逾時，請重新整理以確認目前連線狀態。"]="Operation timed out. Refresh to check the current connection.",["操作未完成，請開啟官方 Tailscale 查看狀態。"]="Operation didn't complete. Open Tailscale to check its status.",
-        ["官方 Tailscale 已啟動，請從系統匣開啟。"]="Tailscale has started. Open it from the notification area.",
+        ["由 AuNight 製作"]="Made by AuNight",["官方 Tailscale 已啟動，請從系統匣開啟。"]="Tailscale has started. Open it from the notification area.",
         ["語言 / Language"]="Language",["語言將於下次啟動套用。"]="The language will apply the next time Capsule starts."
     };
     static readonly Dictionary<string,string> prefixes = new()
