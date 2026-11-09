@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
+ <ItemGroup>
+  <Compile Include="../TailscaleService.cs" Link="TailscaleService.cs" />
+  <Compile Include="../TransferHistory.cs" Link="TransferHistory.cs" />
+  <Compile Include="../ReleaseUpdateClient.cs" Link="ReleaseUpdateClient.cs" />
+  <Compile Include="../Locale.cs" Link="Locale.cs" />
+ </ItemGroup>
+</Project>
