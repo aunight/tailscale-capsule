@@ -406,12 +406,15 @@ public sealed partial class MainWindow : Window
         double scale = Native.GetDpiForWindow(hwnd) / 96d;
         var work = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
         peerScroll.MaxHeight = Math.Clamp(work.Height / scale - 400, 80, DemoMode ? 360 : 290);
-        quickScroll.MaxHeight = Math.Max(200, work.Height / scale - 112);
-        historyScroll.MaxHeight = Math.Max(200, work.Height / scale - 112);
+        // The viewport and window must use the same height limit. The old
+        // independent scroll cap left an empty strip below long settings pages.
+        double maxBodyHeight = Math.Max(0, (work.Height - 16) / scale - header.Height);
+        quickScroll.MaxHeight = maxBodyHeight;
+        historyScroll.MaxHeight = maxBodyHeight;
         double width = quickMode ? 368 : 468;
         FrameworkElement panel = historyMode ? historyBody : quickMode ? quickBody : body;
-        panel.Measure(new Windows.Foundation.Size(width, Math.Max(200, work.Height / scale - 72)));
-        double desired = 72 + panel.DesiredSize.Height;
+        panel.Measure(new Windows.Foundation.Size(width, maxBodyHeight));
+        double desired = header.Height + Math.Min(panel.DesiredSize.Height, maxBodyHeight);
         int height = Math.Min((int)Math.Ceiling(desired * scale), work.Height - 16);
         AppWindow.Resize(new((int)(width * scale), height));
         Native.RemoveFrame(hwnd);
